@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demo Mini App</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- Monetag Ad Script (তুমি যেটা দিয়েছ) -->
+<script src='//libtl.com/sdk.js' data-zone='9715146' data-sdk='show_9715146'></script>
+
+<style>
+body { font-family: system-ui, Arial, sans-serif; background:#0f172a; color:#fff; margin:0; padding:16px; }
+.card { background:#111827; padding:16px; border-radius:12px; margin-bottom:12px; }
+.btn { background:#06b6d4; color:#001; padding:12px 16px; border:none; border-radius:8px; font-weight:700; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>👋 স্বাগতম Demo Mini App-এ</h2>
+  <p id="hello">লোড হচ্ছে...</p>
+</div>
+<div class="card">
+  <button id="claimBtn" class="btn">✅ Claim Reward</button>
+  <p id="msg"></p>
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp; tg && tg.expand();
+const user = tg?.initDataUnsafe?.user;
+document.getElementById('hello').innerText = user ?
+    `হ্যালো, ${user.first_name} (ID: ${user.id})` :
+    'Telegram এর ভিতর থেকে খুলুন';
+
+// Backend একই ডোমেইন থেকে সার্ভ হবে (Render) — তাই রিলেটিভ পাথ ব্যবহার করছি
+document.getElementById("claimBtn").onclick = async () => {
+  let res = await fetch("/claim", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({user_id: user?.id})
+  });
+  let data = await res.json();
+  document.getElementById("msg").innerText = data.message || "Done";
+};
+</script>
+</body>
+</html>
