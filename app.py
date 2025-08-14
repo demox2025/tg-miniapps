@@ -3,11 +3,10 @@ from flask import Flask, request, render_template, jsonify
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes
 
-# ENV থেকে নাও (Render-এ সেট করবে)
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 ADMIN_IDS = [int(x) for x in os.environ.get("ADMIN_IDS", "6065882445").split(",") if x.strip().isdigit()]
 AD_CREDIT = float(os.environ.get("AD_CREDIT", "0.02"))
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "")  # প্রথম ডিপ্লয়ের পর Render URL সেট করবে
+FRONTEND_URL = "https://tg-miniapps.onrender.com"
 
 app = Flask(__name__, template_folder="templates")
 
@@ -34,10 +33,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try: ref = int(context.args[0])
         except: pass
     ensure_user(update.effective_user.id, update.effective_user.username, ref)
-
-    # FRONTEND_URL সেট থাকলে সেটা, নাহলে ব্যাকএন্ডের রুট URL ব্যবহারের নির্দেশ (Render-URL বসানোর সুবিধা)
-    url = FRONTEND_URL if FRONTEND_URL else f"https://example.com"
-    kb = [[InlineKeyboardButton("🚀 Open App", web_app=WebAppInfo(url=url))]]
+    kb = [[InlineKeyboardButton("🚀 Open App", web_app=WebAppInfo(url=FRONTEND_URL))]]
     await update.message.reply_text("স্বাগতম! নিচের বাটনে চাপুন Mini App খোলার জন্য।", reply_markup=InlineKeyboardMarkup(kb))
 
 async def admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -62,7 +58,6 @@ application.add_handler(CommandHandler("start", start))
 application.add_handler(CommandHandler("admin", admin))
 application.add_handler(CommandHandler("withdraw_history", withdraw_history))
 
-# Flask routes
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -78,8 +73,7 @@ def claim():
     conn.commit()
     return jsonify({"message":f"✅ {AD_CREDIT} ক্রেডিট যোগ হয়েছে!"})
 
-# Telegram webhook endpoint
-@app.post(f"/webhook/{os.environ.get('BOT_TOKEN','placeholder')}")
+@app.post(f"/webhook/{BOT_TOKEN}")
 def webhook():
     update = Update.de_json(request.get_json(force=True), application.bot)
     asyncio.run(application.process_update(update))
