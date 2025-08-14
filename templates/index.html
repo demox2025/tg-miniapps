@@ -6,7 +6,7 @@
 <title>Demo Mini App</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<!-- Monetag Ad Script (তুমি যেটা দিয়েছ) -->
+<!-- Monetag Ad Script -->
 <script src='//libtl.com/sdk.js' data-zone='9715146' data-sdk='show_9715146'></script>
 
 <style>
@@ -17,7 +17,7 @@ body { font-family: system-ui, Arial, sans-serif; background:#0f172a; color:#fff
 </head>
 <body>
 <div class="card">
-  <h2>👋 স্বাগতম Demo Mini App-এ</h2>
+  <h2>👋 স্বাগতম Demo Mini App‑এ</h2>
   <p id="hello">লোড হচ্ছে...</p>
 </div>
 <div class="card">
@@ -32,9 +32,8 @@ document.getElementById('hello').innerText = user ?
     `হ্যালো, ${user.first_name} (ID: ${user.id})` :
     'Telegram এর ভিতর থেকে খুলুন';
 
-// Backend একই ডোমেইন থেকে সার্ভ হবে (Render) — তাই রিলেটিভ পাথ ব্যবহার করছি
 document.getElementById("claimBtn").onclick = async () => {
-  let res = await fetch("/claim", {
+  let res = await fetch("https://tg-miniapps.onrender.com/claim", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({user_id: user?.id})
